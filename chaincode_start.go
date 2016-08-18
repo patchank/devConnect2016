@@ -73,13 +73,13 @@ func (t *SimpleChaincode) winChallenge(stub *shim.ChaincodeStub, args []string) 
 
     if(args[1]!="PS12094") {
         err = stub.PutState(key, []byte("Wrong validation code!"))  
-        return nil, errors.New("Wrong validation code!")
+        return nil, nil
     }
     err = stub.PutState(key, []byte(value))  
     if err != nil {
         return nil, err
     }
-    return nil, nil   // ibmbluemix
+    return []byte("ibmbluemix"), nil   // ibmbluemix
 }
 
 func (t *SimpleChaincode) read(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
