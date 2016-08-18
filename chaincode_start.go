@@ -37,8 +37,8 @@ func (t *SimpleChaincode) Invoke(stub *shim.ChaincodeStub, function string, args
 	// Handle different functions
 	if function == "init" {													//initialize the chaincode state, used as reset
 		return t.Init(stub, "init", args)
-	} else if function == "write" {
-        return t.write(stub, args)
+	} else if function == "winChallenge" {
+        return t.winChallenge(stub, args)
     }
 	fmt.Println("invoke did not find func: " + function)					//error
 
@@ -58,25 +58,28 @@ func (t *SimpleChaincode) Query(stub *shim.ChaincodeStub, function string, args 
 	return nil, errors.New("Received unknown function query")
 }
 
-func (t *SimpleChaincode) write(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
+// args[]  team, code
+func (t *SimpleChaincode) winChallenge(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
     var key, value string
     var err error
-    fmt.Println("running write()")
+    fmt.Println("running winChallenge()")
 
-    if len(args) != 3 {
-        return []byte("ERROR"), errors.New("Incorrect number of arguments. Expecting 3. name of the key, value to set, and validation code")
+    if len(args) != 2 {
+        return []byte("ERROR"), errors.New("Incorrect number of arguments. Expecting 2. team validation code")
     }
-    
-    if(args[2]!="PS12094") {
+
+    key = args[0]                            
+    value = "ibmbluemix"
+
+    if(args[1]!="PS12094") {
+        err = stub.PutState(key, []byte("Wrong validation code!"))  
         return nil, errors.New("Wrong validation code!")
     }
-    key = args[0]                            
-    value = args[1]
     err = stub.PutState(key, []byte(value))  
     if err != nil {
         return nil, err
     }
-    return []byte("Clave final: ibmbluemix"), nil   // ibmbluemix
+    return nil, nil   // ibmbluemix
 }
 
 func (t *SimpleChaincode) read(stub *shim.ChaincodeStub, args []string) ([]byte, error) {
